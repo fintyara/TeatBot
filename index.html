@@ -15,7 +15,6 @@
       #banner .i{color:#9be69b}
     </style>
     <script>
-      // ➊ Отрубаем streaming-компиляцию — частая причина зависания на Pages
       WebAssembly.instantiateStreaming = undefined;
     </script>
   </head>
@@ -25,12 +24,12 @@
     <div id="banner"></div>
 
     <script>
-      const v = 'v=3'; // меняй при каждом пуше, чтобы пробивать кеш
+      const v = 'v=4';
       const files = {
-        loader:  "Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?" + v,
-        data:    "Build/3b80d4ac4d7ccebbcf71e8712780c18f.data.unityweb?" + v,
+        loader:   "Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?" + v,
+        data:     "Build/game.data.unityweb?" + v,
         framework:"Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb?" + v,
-        wasm:    "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb?" + v
+        wasm:     "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb?" + v
       };
 
       const banner = document.getElementById('banner');
@@ -44,7 +43,7 @@
         else console.log(msg);
       }
 
-      // HEAD-проверка всех файлов
+      // HEAD-проверка
       Promise.all(Object.entries(files).map(([k,u]) =>
         fetch(u, { method:'HEAD', cache:'no-store' })
           .then(r => { if(!r.ok) throw new Error(k+' → '+r.status); showBanner('OK '+k+' '+u, 'info'); })
@@ -52,7 +51,7 @@
       ));
     </script>
 
-    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?v=3"></script>
+    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?v=4"></script>
     <script>
       const tg = window.Telegram && Telegram.WebApp ? Telegram.WebApp : null;
       if (tg) { try { tg.expand(); tg.ready(); } catch(e){} }
@@ -60,9 +59,9 @@
       const canvas = document.getElementById('unity-canvas');
 
       createUnityInstance(canvas, {
-        dataUrl: files.data,
-        frameworkUrl: files.framework,
-        codeUrl: files.wasm,
+        dataUrl: "Build/game.data.unityweb?v=4",
+        frameworkUrl: "Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb?v=4",
+        codeUrl: "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb?v=4",
         showBanner
       }).then(()=>{
         document.getElementById('loader').style.display='none';
