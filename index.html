@@ -9,25 +9,19 @@
       html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#000}
       #unity-canvas{display:block;width:100vw;height:100vh}
     </style>
-    <script>
-      // Можно оставить, чтобы не упираться в MIME на Pages
-      WebAssembly.instantiateStreaming = undefined;
-    </script>
+    <script>WebAssembly.instantiateStreaming=undefined;</script>
   </head>
   <body>
     <canvas id="unity-canvas"></canvas>
-
-    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?v=5"></script>
+    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?v=6"></script>
     <script>
-      const tg = window.Telegram && Telegram.WebApp ? Telegram.WebApp : null;
-      if (tg) { try { tg.expand(); tg.ready(); tg.MainButton.hide(); tg.BackButton.hide(); } catch(e){} }
-
-      const canvas = document.getElementById('unity-canvas');
-
-      createUnityInstance(canvas, {
-        dataUrl:      "Build/game.data.unityweb?v=5",
-        frameworkUrl: "Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb?v=5",
-        codeUrl:      "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb?v=5"
+      const tg=window.Telegram&&Telegram.WebApp?Telegram.WebApp:null;
+      if(tg){try{tg.expand();tg.ready();tg.MainButton.hide();tg.BackButton.hide();}catch(e){}}
+      const canvas=document.getElementById('unity-canvas');
+      createUnityInstance(canvas,{
+        dataUrl:"Build/game.data.unityweb?v=6",
+        frameworkUrl:"Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb?v=6",
+        codeUrl:"Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb?v=6"
       });
     </script>
   </body>
