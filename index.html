@@ -8,25 +8,62 @@
     <style>
       html,body{margin:0;height:100%;background:#000}
       #unity-canvas{width:100vw;height:100vh;display:block}
-      #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font:16px sans-serif}
+      #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font:16px/1.4 system-ui}
+      #banner{position:fixed;left:0;right:0;bottom:0;background:#222;color:#fff;padding:10px;font:12px/1.4 ui-monospace,monospace;max-height:45vh;overflow:auto}
+      #banner .e{color:#ff6b6b}
+      #banner .w{color:#ffd166}
+      #banner .i{color:#9be69b}
     </style>
   </head>
   <body>
     <div id="loader">Loading…</div>
     <canvas id="unity-canvas"></canvas>
+    <div id="banner"></div>
 
-    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js"></script>
     <script>
+      const banner = document.getElementById('banner');
+      function showBanner(msg, type){
+        const div = document.createElement('div');
+        div.className = (type==='error'?'e':type==='warning'?'w':'i');
+        div.textContent = '['+(type||'info').toUpperCase()+'] '+msg;
+        banner.appendChild(div);
+        if(type==='error') console.error(msg);
+        else if(type==='warning') console.warn(msg);
+        else console.log(msg);
+      }
+
       const tg = window.Telegram && Telegram.WebApp ? Telegram.WebApp : null;
       if (tg) { try { tg.expand(); tg.ready(); } catch(e){} }
 
       const canvas = document.getElementById('unity-canvas');
+
+      // Подсказка, если какой-то файл 404
+      ['813700ccfaf64a0a3c57e3aa3166490b.loader.js',
+       '3b80d4ac4d7ccebbcf71e8712780c18f.data.unityweb',
+       '4a926910a10305d3753f27a24a39c83d.framework.js.unityweb',
+       '7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb'
+      ].forEach(f=>{
+        fetch('Build/'+f, {method:'HEAD'}).then(r=>{
+          if(!r.ok) showBanner('Не найден файл Build/'+f+' ('+r.status+')','error');
+        }).catch(err=>{
+          showBanner('Ошибка запроса Build/'+f+': '+String(err),'error');
+        });
+      });
+    </script>
+
+    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js"></script>
+    <script>
       createUnityInstance(canvas, {
         dataUrl: "Build/3b80d4ac4d7ccebbcf71e8712780c18f.data.unityweb",
         frameworkUrl: "Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb",
-        codeUrl: "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb"
-      }).then(() => {
-        document.getElementById('loader').style.display = 'none';
+        codeUrl: "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb",
+        showBanner
+      }).then(()=>{
+        document.getElementById('loader').style.display='none';
+        showBanner('Unity загружен','info');
+      }).catch(err=>{
+        document.getElementById('loader').textContent='Ошибка загрузки';
+        showBanner(String(err),'error');
       });
     </script>
   </body>
