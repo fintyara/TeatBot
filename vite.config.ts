@@ -2,14 +2,12 @@ import { defineConfig, PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import UnoCSS from 'unocss/vite';
-import { visualizer } from 'rollup-plugin-visualizer';
 import Unfonts from 'unplugin-fonts/vite';
+import { visualizer } from 'rollup-plugin-visualizer';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
-// https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
-  const FONTS = [];
-
+  const FONTS: string[] = [];
   const plugins: PluginOption[] = [
     UnoCSS(),
     react(),
@@ -25,8 +23,7 @@ export default defineConfig(({ command, mode }) => {
         ],
       },
     }),
-    // Плагин остается, чтобы обработать простые случаи
-    nodePolyfills(),
+    nodePolyfills({ protocolImports: true })
   ];
 
   if (mode === 'analysis' && command === 'build') {
@@ -40,25 +37,41 @@ export default defineConfig(({ command, mode }) => {
 
   return {
     base: '/TeatBot/',
+    define: {
+      global: 'globalThis',
+      'process.env': {}
+    },
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, './src'),
+        lodash: 'lodash-es',
+        fs: resolve(__dirname, './src/shims/empty.ts'),
+        'fs/promises': resolve(__dirname, './src/shims/empty.ts'),
+        path: 'path-browserify',
+        process: 'process/browser',
+        stream: 'stream-browserify',
+        util: 'util',
+        buffer: 'buffer'
+      }
+    },
+    optimizeDeps: {
+      exclude: ['fs', 'fs/promises']
+    },
     build: {
       rollupOptions: {
         output: {
           manualChunks: {
-            react: ['react', 'react-dom', 'react-router-dom'],
-          },
-        },
+            react: ['react', 'react-dom', 'react-router-dom']
+          }
+        }
       },
-    },
-    resolve: {
-      // 👇 ХИРУРГИЧЕСКОЕ ВМЕШАТЕЛЬСТВО 👇
-      // Мы явно приказываем сборщику заменить конкретный проблемный модуль на его браузерный аналог.
-      alias: {
-        '@': resolve(__dirname, './src'),
-        'lodash': 'lodash-es',
-        // Это правило напрямую решает последнюю ошибку 'ENOTDIR'
-        'fs/promises': 'browserify-fs',
+      commonjsOptions: {
+        transformMixedEsModules: true
       },
+      target: 'es2020',
+      assetsInlineLimit: 0
     },
-    plugins,
+    assetsInclude: ['**/*.data', '**/*.wasm', '**/*.unityweb', '**/*.br', '**/*.gz'],
+    plugins
   };
 });
