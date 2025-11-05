@@ -4,7 +4,6 @@ import { resolve } from 'path';
 import UnoCSS from 'unocss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import Unfonts from 'unplugin-fonts/vite';
-// Просто импортируем плагин, без хаков
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 // https://vitejs.dev/config/
@@ -26,16 +25,8 @@ export default defineConfig(({ command, mode }) => {
         ],
       },
     }),
-    // Убрали сломанный "костыль" и используем плагин напрямую, как положено
-    nodePolyfills({
-      include: ['path', 'stream', 'util', 'os'],
-      exclude: ['http'],
-      globals: {
-        Buffer: true,
-        global: true,
-        process: true,
-      },
-    })
+    // 👇 ГЛАВНОЕ ИЗМЕНЕНИЕ: Мы убираем все ограничения и позволяем плагину работать в полную силу 👇
+    nodePolyfills()
   ];
 
   if (mode === 'analysis' && command === 'build') {
