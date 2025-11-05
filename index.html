@@ -1,18 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TeatBot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+      html,body{margin:0;height:100%;background:#000}
+      #unity-canvas{width:100vw;height:100vh;display:block}
+      #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font:16px sans-serif}
+    </style>
+  </head>
+  <body>
+    <div id="loader">Loading…</div>
+    <canvas id="unity-canvas"></canvas>
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Yescoin - Unity Game Template</title>
-  <meta property="og:title" content="Yescoin - Unity Game Template" />
-  <meta property="og:image" content="/android-chrome-512x512.png" />
-</head>
+    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js"></script>
+    <script>
+      const tg = window.Telegram && Telegram.WebApp ? Telegram.WebApp : null;
+      if (tg) { try { tg.expand(); tg.ready(); } catch(e){} }
 
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/index.tsx"></script>
-</body>
-
+      const canvas = document.getElementById('unity-canvas');
+      createUnityInstance(canvas, {
+        dataUrl: "Build/3b80d4ac4d7ccebbcf71e8712780c18f.data.unityweb",
+        frameworkUrl: "Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb",
+        codeUrl: "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb"
+      }).then(() => {
+        document.getElementById('loader').style.display = 'none';
+      });
+    </script>
+  </body>
 </html>
