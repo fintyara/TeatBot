@@ -16,6 +16,7 @@
     "@tsparticles/all": "^3.7.1",
     "@tsparticles/engine": "^3.7.1",
     "@tsparticles/react": "^3.0.0",
+    "browserify-fs": "^1.2.2",
     "classnames": "^2.5.1",
     "framer-motion": "^11.13.5",
     "lodash": "^4.17.21",
