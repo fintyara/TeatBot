@@ -14,6 +14,10 @@
       #banner .w{color:#ffd166}
       #banner .i{color:#9be69b}
     </style>
+    <script>
+      // ➊ Отрубаем streaming-компиляцию — частая причина зависания на Pages
+      WebAssembly.instantiateStreaming = undefined;
+    </script>
   </head>
   <body>
     <div id="loader">Loading…</div>
@@ -21,6 +25,14 @@
     <div id="banner"></div>
 
     <script>
+      const v = 'v=3'; // меняй при каждом пуше, чтобы пробивать кеш
+      const files = {
+        loader:  "Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?" + v,
+        data:    "Build/3b80d4ac4d7ccebbcf71e8712780c18f.data.unityweb?" + v,
+        framework:"Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb?" + v,
+        wasm:    "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb?" + v
+      };
+
       const banner = document.getElementById('banner');
       function showBanner(msg, type){
         const div = document.createElement('div');
@@ -32,31 +44,25 @@
         else console.log(msg);
       }
 
+      // HEAD-проверка всех файлов
+      Promise.all(Object.entries(files).map(([k,u]) =>
+        fetch(u, { method:'HEAD', cache:'no-store' })
+          .then(r => { if(!r.ok) throw new Error(k+' → '+r.status); showBanner('OK '+k+' '+u, 'info'); })
+          .catch(err => { showBanner('FAIL '+k+' '+u+' :: '+err.message, 'error'); })
+      ));
+    </script>
+
+    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?v=3"></script>
+    <script>
       const tg = window.Telegram && Telegram.WebApp ? Telegram.WebApp : null;
       if (tg) { try { tg.expand(); tg.ready(); } catch(e){} }
 
       const canvas = document.getElementById('unity-canvas');
 
-      // Подсказка, если какой-то файл 404
-      ['813700ccfaf64a0a3c57e3aa3166490b.loader.js',
-       '3b80d4ac4d7ccebbcf71e8712780c18f.data.unityweb',
-       '4a926910a10305d3753f27a24a39c83d.framework.js.unityweb',
-       '7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb'
-      ].forEach(f=>{
-        fetch('Build/'+f, {method:'HEAD'}).then(r=>{
-          if(!r.ok) showBanner('Не найден файл Build/'+f+' ('+r.status+')','error');
-        }).catch(err=>{
-          showBanner('Ошибка запроса Build/'+f+': '+String(err),'error');
-        });
-      });
-    </script>
-
-    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js"></script>
-    <script>
       createUnityInstance(canvas, {
-        dataUrl: "Build/3b80d4ac4d7ccebbcf71e8712780c18f.data.unityweb",
-        frameworkUrl: "Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb",
-        codeUrl: "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb",
+        dataUrl: files.data,
+        frameworkUrl: files.framework,
+        codeUrl: files.wasm,
         showBanner
       }).then(()=>{
         document.getElementById('loader').style.display='none';
