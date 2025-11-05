@@ -6,69 +6,28 @@
     <title>TeatBot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-      html,body{margin:0;height:100%;background:#000}
-      #unity-canvas{width:100vw;height:100vh;display:block}
-      #loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font:16px/1.4 system-ui}
-      #banner{position:fixed;left:0;right:0;bottom:0;background:#222;color:#fff;padding:10px;font:12px/1.4 ui-monospace,monospace;max-height:45vh;overflow:auto}
-      #banner .e{color:#ff6b6b}
-      #banner .w{color:#ffd166}
-      #banner .i{color:#9be69b}
+      html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#000}
+      #unity-canvas{display:block;width:100vw;height:100vh}
     </style>
     <script>
+      // Можно оставить, чтобы не упираться в MIME на Pages
       WebAssembly.instantiateStreaming = undefined;
     </script>
   </head>
   <body>
-    <div id="loader">Loading…</div>
     <canvas id="unity-canvas"></canvas>
-    <div id="banner"></div>
 
-    <script>
-      const v = 'v=4';
-      const files = {
-        loader:   "Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?" + v,
-        data:     "Build/game.data.unityweb?" + v,
-        framework:"Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb?" + v,
-        wasm:     "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb?" + v
-      };
-
-      const banner = document.getElementById('banner');
-      function showBanner(msg, type){
-        const div = document.createElement('div');
-        div.className = (type==='error'?'e':type==='warning'?'w':'i');
-        div.textContent = '['+(type||'info').toUpperCase()+'] '+msg;
-        banner.appendChild(div);
-        if(type==='error') console.error(msg);
-        else if(type==='warning') console.warn(msg);
-        else console.log(msg);
-      }
-
-      // HEAD-проверка
-      Promise.all(Object.entries(files).map(([k,u]) =>
-        fetch(u, { method:'HEAD', cache:'no-store' })
-          .then(r => { if(!r.ok) throw new Error(k+' → '+r.status); showBanner('OK '+k+' '+u, 'info'); })
-          .catch(err => { showBanner('FAIL '+k+' '+u+' :: '+err.message, 'error'); })
-      ));
-    </script>
-
-    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?v=4"></script>
+    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?v=5"></script>
     <script>
       const tg = window.Telegram && Telegram.WebApp ? Telegram.WebApp : null;
-      if (tg) { try { tg.expand(); tg.ready(); } catch(e){} }
+      if (tg) { try { tg.expand(); tg.ready(); tg.MainButton.hide(); tg.BackButton.hide(); } catch(e){} }
 
       const canvas = document.getElementById('unity-canvas');
 
       createUnityInstance(canvas, {
-        dataUrl: "Build/game.data.unityweb?v=4",
-        frameworkUrl: "Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb?v=4",
-        codeUrl: "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb?v=4",
-        showBanner
-      }).then(()=>{
-        document.getElementById('loader').style.display='none';
-        showBanner('Unity загружен','info');
-      }).catch(err=>{
-        document.getElementById('loader').textContent='Ошибка загрузки';
-        showBanner(String(err),'error');
+        dataUrl:      "Build/game.data.unityweb?v=5",
+        frameworkUrl: "Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb?v=5",
+        codeUrl:      "Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb?v=5"
       });
     </script>
   </body>
