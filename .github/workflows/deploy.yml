@@ -21,19 +21,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4 # <-- ИЗМЕНЕНО
+        uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v4 # <-- ИЗМЕНЕНО
+        uses: actions/setup-node@v4
         with:
           node-version: 18
+
+      # 👇 ---- ЭТОТ БЛОК МЫ ДОБАВИЛИ И ИЗМЕНИЛИ ---- 👇
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8 # Устанавливаем последнюю версию pnpm
+
       - name: Install dependencies
-        run: npm install
+        run: pnpm install # Используем pnpm вместо npm
+
       - name: Build
-        run: npm run build
+        run: pnpm run build # Используем pnpm для сборки
+      # 👆 ------------------------------------------- 👆
+
       - name: Setup Pages
-        uses: actions/configure-pages@v5 # <-- ИЗМЕНЕНО
+        uses: actions/configure-pages@v5
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3 # <-- ИЗМЕНЕНО (самое главное)
+        uses: actions/upload-pages-artifact@v3
         with:
           path: './dist'
       
@@ -46,4 +56,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4 # <-- ИЗМЕНЕНО
+        uses: actions/deploy-pages@v4
