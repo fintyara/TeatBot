@@ -1,13 +1,27 @@
-import { defineConfig, PluginOption } from 'vite';
+import { defineConfig, Plugin, PluginOption } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import UnoCSS from 'unocss/vite';
-import Unfonts from 'unplugin-fonts/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import Unfonts from 'unplugin-fonts/vite';
+import { nodePolyfills, PolyfillOptions } from 'vite-plugin-node-polyfills'
 
+const nodePolyfillsFix = (options?: PolyfillOptions | undefined): Plugin => {
+  return {
+    ...nodePolyfills(options),
+    resolveId(source: string) {
+      const m = /^vite-plugin-node-polyfills\/shims\/(buffer|global|process)$/.exec(source)
+      if (m) {
+        return `node_modules/vite-plugin-node-polyfills/shims/${m[1]}/dist/index.cjs`
+      }
+    }
+  }
+}
+
+// https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
-  const FONTS: string[] = [];
+  const FONTS = [];
+
   const plugins: PluginOption[] = [
     UnoCSS(),
     react(),
@@ -23,7 +37,15 @@ export default defineConfig(({ command, mode }) => {
         ],
       },
     }),
-    nodePolyfills({ protocolImports: true })
+    nodePolyfillsFix({
+      include: ['path', 'stream', 'util'],
+      exclude: ['http'],
+      globals: {
+        Buffer: true,
+        global: true,
+        process: true,
+      },
+    })
   ];
 
   if (mode === 'analysis' && command === 'build') {
@@ -36,42 +58,21 @@ export default defineConfig(({ command, mode }) => {
   }
 
   return {
-    base: '/TeatBot/',
-    define: {
-      global: 'globalThis',
-      'process.env': {}
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ['react', 'react-dom', 'react-router-dom'],
+          },
+        },
+      },
     },
     resolve: {
       alias: {
         '@': resolve(__dirname, './src'),
         lodash: 'lodash-es',
-        fs: resolve(__dirname, './src/shims/empty.ts'),
-        'fs/promises': resolve(__dirname, './src/shims/empty.ts'),
-        path: 'path-browserify',
-        process: 'process/browser',
-        stream: 'stream-browserify',
-        util: 'util',
-        buffer: 'buffer'
-      }
-    },
-    optimizeDeps: {
-      exclude: ['fs', 'fs/promises']
-    },
-    build: {
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            react: ['react', 'react-dom', 'react-router-dom']
-          }
-        }
       },
-      commonjsOptions: {
-        transformMixedEsModules: true
-      },
-      target: 'es2020',
-      assetsInlineLimit: 0
     },
-    assetsInclude: ['**/*.data', '**/*.wasm', '**/*.unityweb', '**/*.br', '**/*.gz'],
-    plugins
+    plugins,
   };
 });
