@@ -13,15 +13,15 @@
   </head>
   <body>
     <canvas id="unity-canvas"></canvas>
-    <script src="Build/813700ccfaf64a0a3c57e3aa3166490b.loader.js?v=6"></script>
+    <script src="Build/5.loader.js?v=7"></script>
     <script>
       const tg=window.Telegram&&Telegram.WebApp?Telegram.WebApp:null;
       if(tg){try{tg.expand();tg.ready();tg.MainButton.hide();tg.BackButton.hide();}catch(e){}}
       const canvas=document.getElementById('unity-canvas');
       createUnityInstance(canvas,{
-        dataUrl:"Build/game.data.unityweb?v=6",
-        frameworkUrl:"Build/4a926910a10305d3753f27a24a39c83d.framework.js.unityweb?v=6",
-        codeUrl:"Build/7d8f6be0ae72a26161506d6a005c5de6.wasm.unityweb?v=6"
+        dataUrl:"Build/5.data.unityweb?v=7",
+        frameworkUrl:"Build/5.framework.js.unityweb?v=7",
+        codeUrl:"Build/5.wasm.unityweb?v=7"
       });
     </script>
   </body>
